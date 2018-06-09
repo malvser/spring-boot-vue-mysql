@@ -83,10 +83,9 @@
     <!-- Info modal -->
     <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
 
-      <input {{ itm.firstName }}>
-      <pre>{{ itm.lastName}}</pre>
+       <pre>{{modalInfo.content}}</pre>
     </b-modal>
-
+z
   </b-container>
 </template>
 
@@ -94,7 +93,7 @@
   /* eslint-disable standard/object-curly-even-spacing */
 
   import {AXIOS} from './http-common'
-  import DbModal from './DbModal.vue'
+
   const items = [
     { isActive: true, age: 40, name: { first: 'Dickerson', last: 'Macdonald' } },
     { isActive: false, age: 21, name: { first: 'Larsen', last: 'Shaw' } },
@@ -157,9 +156,6 @@
           this.errors.push(e)
         })
     },
-    components: {
-      DbModal
-    },
     computed: {
       sortOptions () {
         // Create an options list from our fields
@@ -175,8 +171,6 @@
       info (item, index, button) {
         this.modalInfo.title = `Row index: ${index}`
         this.modalInfo.content = JSON.stringify(item, null, 2)
-        this.itm.firstName = item.firstName
-        this.itm.lastName = item.lastName
         this.$root.$emit('bv::show::modal', 'modalInfo', button)
       },
       resetModal () {
