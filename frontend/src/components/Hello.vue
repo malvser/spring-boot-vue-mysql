@@ -61,7 +61,7 @@
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
         <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
-          Info modal
+          Редактировать
         </b-button>
 
       </template>
@@ -83,9 +83,21 @@
     <!-- Info modal -->
     <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
 
-       <pre>{{modalInfo.content}}</pre>
+      <div class="label">First Name</div>
+      <pre> <input type="text" v-model="user.firstName" ></pre>
+
+        <div class="label">Last Name</div>
+        <pre><input v-model="user.lastName"></pre>
+
+      <b-button size="sm" @click.stop="updateUser()" class="mr-1">
+        Обновить
+      </b-button>
+      <b-button size="sm" @click.stop="updateUser()" class="mr-1">
+        Отмена
+      </b-button>
+
     </b-modal>
-z
+
   </b-container>
 </template>
 
@@ -124,7 +136,11 @@ z
       return {
         items: [],
         errors: [],
-        form: '',
+        user: {
+          lastName: '',
+          firstName: '',
+          id: 0
+        },
         fields: [
           { key: 'firstName', label: 'First Name', sortable: true, sortDirection: 'desc' },
           { key: 'lastName', label: 'Last Name', sortable: true, 'class': 'text-center' },
@@ -139,8 +155,9 @@ z
         sortDirection: 'asc',
         filter: null,
         dialogFormVisible: true,
-        modalInfo: { title: '', content: '' },
-        itm: { firstName: '', lastName: ''}
+        modalInfo: { title: '', content: {firstName: '', lastName: ''} },
+        retrievedUser: {}
+
       }
     },
     created () {
@@ -170,12 +187,18 @@ z
       },
       info (item, index, button) {
         this.modalInfo.title = `Row index: ${index}`
+        this.user.firstName = item.firstName
+        this.user.lastName = item.lastName
+        console.log('user.firstName - ' + this.user.firstName)
         this.modalInfo.content = JSON.stringify(item, null, 2)
+        this.retrievedUser = JSON.stringify(item, null, 2)
+        console.log(' this.retrievedUser - ' + this.retrievedUser)
+        console.log(' this.retrievedUser.firstName - ' + this.retrievedUser.firstName)
         this.$root.$emit('bv::show::modal', 'modalInfo', button)
       },
       resetModal () {
-        this.modalInfo.title = ''
-        this.modalInfo.content = ''
+        this.user.firstName = ''
+        this.user.lastName = ''
       },
       onFiltered (filteredItems) {
         // Trigger pagination to update the number of buttons/pages due to filtering
