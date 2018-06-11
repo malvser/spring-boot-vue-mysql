@@ -1,4 +1,5 @@
 <template>
+  <div id="app">
   <b-container fluid>
     <!-- User Interface controls -->
     <b-row>
@@ -49,7 +50,7 @@
 
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-        <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
+        <b-button size="sm" @click.stop="info(row.item)" class="mr-1">
           Редактировать
         </b-button>
 
@@ -63,7 +64,7 @@
       </b-col>
     </b-row>
 
-    <!-- Info modal -->
+
     <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
 
       <div class="label">Имя</div>
@@ -82,16 +83,26 @@
     </b-modal>
 
 
+   <!-- <db-modal v-if="showModal"  :form="form" v-on:canclemodal="dialogVisible"></db-modal>-->
+    <db-modal :users = "user"
+      v-show="isModalVisible"
+      @close="closeModal"
+    />
+
+
   </b-container>
+  </div>
 </template>
 
 <script>
   /* eslint-disable standard/object-curly-even-spacing */
 
   import {AXIOS} from './http-common'
+  import DbModal from './DbModal.vue'
   export default {
     data () {
       return {
+        isModalVisible: false,
         items: [],
         errors: [],
         user: {
@@ -112,11 +123,14 @@
         sortDesc: false,
         sortDirection: 'asc',
         filter: null,
-        dialogFormVisible: true,
+        dialogFormVisible: false,
         modalInfo: { title: '', content: {firstName: '', lastName: ''} },
-        retrievedUser: {}
-
+        form: '',
+        showModal: true
       }
+    },
+    components: {
+      DbModal
     },
     created () {
       console.log(' created called. ')
@@ -140,18 +154,29 @@
       }
     },
     methods: {
+      closeModal () {
+        this.isModalVisible = false
+      },
       dialogVisible: function () {
         this.dialogFormVisible = false
       },
-      info (item, index, button) {
+      info (item) {
         this.modalInfo.title = `Редактирование`
         this.user.firstName = item.firstName
         this.user.lastName = item.lastName
         this.user.id = item.id
         console.log('user.firstName - ' + this.user.firstName)
-        this.modalInfo.content = JSON.stringify(item, null, 2)
         console.log('button -start')
         this.$root.$emit('bv::show::modal', 'modalInfo')
+        console.log('button - end')
+      },
+      editModal (item) {
+        this.isModalVisible = true
+        this.user.firstName = item.firstName
+        this.user.lastName = item.lastName
+        this.user.id = item.id
+        console.log('user.firstName - ' + this.user.firstName)
+        console.log('button -start')
         console.log('button - end')
       },
       updateUser (item) {
