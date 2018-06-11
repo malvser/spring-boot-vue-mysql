@@ -3,20 +3,20 @@
     <!-- User Interface controls -->
     <b-row>
       <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Filter" class="mb-0">
+        <b-form-group horizontal label="Фильтр" class="mb-0">
           <b-input-group>
-            <b-form-input v-model="filter" placeholder="Type to Search" />
+            <b-form-input v-model="filter" placeholder="Поиск" />
             <b-input-group-append>
-              <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+              <b-btn :disabled="!filter" @click="filter = ''">Очистить</b-btn>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
       </b-col>
       <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Sort" class="mb-0">
+        <b-form-group horizontal label="Сортировка" class="mb-0">
           <b-input-group>
             <b-form-select v-model="sortBy" :options="sortOptions">
-              <option slot="first" :value="null">-- none --</option>
+              <option slot="first" :value="null">-- пусто --</option>
             </b-form-select>
             <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
               <option :value="false">Asc</option>
@@ -25,19 +25,9 @@
           </b-input-group>
         </b-form-group>
       </b-col>
+
       <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Sort direction" class="mb-0">
-          <b-input-group>
-            <b-form-select v-model="sortDirection" slot="append">
-              <option value="asc">Asc</option>
-              <option value="desc">Desc</option>
-              <option value="last">Last</option>
-            </b-form-select>
-          </b-input-group>
-        </b-form-group>
-      </b-col>
-      <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Per page" class="mb-0">
+        <b-form-group horizontal label="К-во страниц" class="mb-0">
           <b-form-select :options="pageOptions" v-model="perPage" />
         </b-form-group>
       </b-col>
@@ -75,11 +65,11 @@
 
     <!-- Info modal -->
     <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
-        <input type="hidden" v-model="user.id" >
-      <div class="label">First Name</div>
+
+      <div class="label">Имя</div>
       <pre> <input type="text" v-model="user.firstName" ></pre>
 
-        <div class="label">Last Name</div>
+        <div class="label">Фамилия</div>
         <pre><input v-model="user.lastName"></pre>
 
       <b-button size="sm" @click.stop="updateUser(user)" class="mr-1">
@@ -99,32 +89,6 @@
   /* eslint-disable standard/object-curly-even-spacing */
 
   import {AXIOS} from './http-common'
-
-  const items = [
-    { isActive: true, age: 40, name: { first: 'Dickerson', last: 'Macdonald' } },
-    { isActive: false, age: 21, name: { first: 'Larsen', last: 'Shaw' } },
-    {
-      isActive: false,
-      age: 9,
-      name: { first: 'Mini', last: 'Navarro' },
-      _rowVariant: 'success'
-    },
-    { isActive: false, age: 89, name: { first: 'Geneva', last: 'Wilson' } },
-    { isActive: true, age: 38, name: { first: 'Jami', last: 'Carney' } },
-    { isActive: false, age: 27, name: { first: 'Essie', last: 'Dunlap' } },
-    { isActive: true, age: 40, name: { first: 'Thor', last: 'Macdonald' } },
-    {
-      isActive: true,
-      age: 87,
-      name: { first: 'Larsen', last: 'Shaw' },
-      _cellVariants: { age: 'danger', isActive: 'warning' }
-    },
-    { isActive: false, age: 26, name: { first: 'Mitzi', last: 'Navarro' } },
-    { isActive: false, age: 22, name: { first: 'Genevieve', last: 'Wilson' } },
-    { isActive: true, age: 38, name: { first: 'John', last: 'Carney' } },
-    { isActive: false, age: 29, name: { first: 'Dick', last: 'Dunlap' } }
-  ]
-
   export default {
     data () {
       return {
@@ -136,13 +100,13 @@
           id: 0
         },
         fields: [
-          { key: 'firstName', label: 'First Name', sortable: true, sortDirection: 'desc' },
-          { key: 'lastName', label: 'Last Name', sortable: true, 'class': 'text-center' },
-          { key: 'actions', label: 'Actions' }
+          { key: 'firstName', label: 'Имя', sortable: true, sortDirection: 'desc' },
+          { key: 'lastName', label: 'Фамилия', sortable: true, 'class': 'text-center' },
+          { key: 'actions', label: 'Действие' }
         ],
         currentPage: 1,
         perPage: 5,
-        totalRows: items.length,
+        totalRows: 2,
         pageOptions: [ 5, 10, 15 ],
         sortBy: null,
         sortDesc: false,
@@ -180,7 +144,7 @@
         this.dialogFormVisible = false
       },
       info (item, index, button) {
-        this.modalInfo.title = `Row index: ${index}`
+        this.modalInfo.title = `Редактирование`
         this.user.firstName = item.firstName
         this.user.lastName = item.lastName
         this.user.id = item.id
@@ -200,34 +164,24 @@
           lastName: lastName
         })
           .then(response => {
-            this.row = response.data
+            this.user = response.data
             console.log('row - update = ' + this.row)
             this.$root.$emit('bv::hide::modal', 'modalInfo')
           })
           .catch(e => {
             this.errors.push(e)
           })
+        location.reload()
       },
       resetModal () {
         this.user.firstName = ''
         this.user.lastName = ''
+        this.user.id = ''
       },
       onFiltered (filteredItems) {
         // Trigger pagination to update the number of buttons/pages due to filtering
         this.totalRows = filteredItems.length
         this.currentPage = 1
-      },
-      edit: function (item, index) {
-        console.log('start edit')
-        this.dialogFormVisible = true
-        AXIOS.get(`/user/` + item.id)
-          .then(response => {
-            this.form = response.data
-            console.log(response.data)
-          })
-          .catch(e => {
-            this.errors.push(e)
-          })
       }
     }
 
