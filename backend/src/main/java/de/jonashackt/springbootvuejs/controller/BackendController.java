@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,6 +49,18 @@ public class BackendController {
     public @ResponseBody User getUserById(@PathVariable("id") long id) {
         LOG.info("Reading user with id " + id + " from database.");
         return userRepository.findById(id).get();
+    }
+
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public User updateUser(@PathVariable Long id, @RequestBody User data) {
+
+        User user = userRepository.findById(id).get();
+
+        user.setFirstName(data.getFirstName());
+
+        user.setLastName(data.getLastName());
+
+        return userRepository.save(user);
     }
 
 }

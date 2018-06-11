@@ -56,8 +56,7 @@
              :sort-direction="sortDirection"
              @filtered="onFiltered"
     >
-      <template slot="name" slot-scope="row">{{row.value.first}} {{row.value.last}}</template>
-      <template slot="isActive" slot-scope="row">{{row.value?'Yes :)':'No :('}}</template>
+
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
         <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
@@ -65,13 +64,7 @@
         </b-button>
 
       </template>
-      <template slot="row-details" slot-scope="row">
-        <b-card>
-          <ul>
-            <li v-for="(value, key) in row.item" :key="key">{{ key }}: {{ value}}</li>
-          </ul>
-        </b-card>
-      </template>
+
     </b-table>
 
     <b-row>
@@ -82,21 +75,22 @@
 
     <!-- Info modal -->
     <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
-
+        <input type="hidden" v-model="user.id" >
       <div class="label">First Name</div>
       <pre> <input type="text" v-model="user.firstName" ></pre>
 
         <div class="label">Last Name</div>
         <pre><input v-model="user.lastName"></pre>
 
-      <b-button size="sm" @click.stop="updateUser()" class="mr-1">
+      <b-button size="sm" @click.stop="updateUser(user)" class="mr-1">
         Обновить
       </b-button>
-      <b-button size="sm" @click.stop="updateUser()" class="mr-1">
+      <b-button size="sm" type="danger" @click=" $root.$emit('bv::hide::modal', 'modalInfo')" class="mr-1">
         Отмена
       </b-button>
 
     </b-modal>
+
 
   </b-container>
 </template>
@@ -189,12 +183,30 @@
         this.modalInfo.title = `Row index: ${index}`
         this.user.firstName = item.firstName
         this.user.lastName = item.lastName
+        this.user.id = item.id
         console.log('user.firstName - ' + this.user.firstName)
         this.modalInfo.content = JSON.stringify(item, null, 2)
-        this.retrievedUser = JSON.stringify(item, null, 2)
-        console.log(' this.retrievedUser - ' + this.retrievedUser)
-        console.log(' this.retrievedUser.firstName - ' + this.retrievedUser.firstName)
-        this.$root.$emit('bv::show::modal', 'modalInfo', button)
+        console.log('button -start')
+        this.$root.$emit('bv::show::modal', 'modalInfo')
+        console.log('button - end')
+      },
+      updateUser (item) {
+        let firstName = item.firstName
+        let lastName = item.lastName
+        console.log('firstname - update = ' + firstName)
+        console.log('user - id = ' + item.id)
+        AXIOS.put(`/user/` + item.id, {
+          firstName: firstName,
+          lastName: lastName
+        })
+          .then(response => {
+            this.row = response.data
+            console.log('row - update = ' + this.row)
+            this.$root.$emit('bv::hide::modal', 'modalInfo')
+          })
+          .catch(e => {
+            this.errors.push(e)
+          })
       },
       resetModal () {
         this.user.firstName = ''
