@@ -1,4 +1,4 @@
-package de.jonashackt.springbootvuejs.domain;
+package malov.serg.domain;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -7,7 +7,7 @@ import java.io.Serializable;
 @Table(name="users")
 public class User implements Serializable {
 
-    // PrimaryKey
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
